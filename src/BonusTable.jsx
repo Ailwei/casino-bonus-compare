@@ -4,9 +4,26 @@ const casinoDetails = {
   "Easybet": { initials: "EZ", className: "easybet", subtitle: "WELCOME OFFER" },
 };
 
+const NOT_STATED = "Not stated";
+
+// Only allow http(s) links; anything else renders without an href.
+function safeUrl(url) {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "http:" || protocol === "https:" ? url : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function formatMoney(amount, currency) {
-  if (amount == null) return "Not stated";
-  return `${currency || "ZAR"} ${Number(amount).toLocaleString("en-ZA")}`;
+  if (amount == null) return NOT_STATED;
+  const value = Number(amount).toLocaleString("en-ZA");
+  return currency ? `${currency} ${value}` : value;
+}
+
+function formatWagering(value) {
+  return value == null ? NOT_STATED : `${value}×`;
 }
 
 export default function BonusTable({ casinos }) {
@@ -45,17 +62,12 @@ export default function BonusTable({ casinos }) {
               </div>
 
               <div className="bonus-label">WELCOME BONUS</div>
-              <div className="bonus-value">{casino.welcome_bonus || "Not stated"}</div>
+              <div className="bonus-value">{casino.welcome_bonus || NOT_STATED}</div>
 
               <div className="metrics">
                 <div className="metric">
                   <span className="metric-label">WAGERING</span>
-                  <strong>{casino.wagering_requirement == null
-                    ? "N/A"
-                    : `${casino.wagering_requirement}×`}</strong>
-                  {casino.name === "Easybet" && (
-                    <span className="metric-note">Selected slots*</span>
-                  )}
+                  <strong>{formatWagering(casino.wagering_requirement)}</strong>
                 </div>
                 <div className="metric">
                   <span className="metric-label">MIN. DEPOSIT</span>
@@ -65,7 +77,7 @@ export default function BonusTable({ casinos }) {
 
               <a
                 className="source-link"
-                href={casino.source_url}
+                href={safeUrl(casino.source_url)}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -97,16 +109,15 @@ export default function BonusTable({ casinos }) {
             {casinos.map((casino) => (
               <tr key={casino.name}>
                 <td className="table-casino">{casino.name}</td>
-                <td>{casino.welcome_bonus || "Not stated"}</td>
-                <td>
-                  {casino.wagering_requirement == null
-                    ? "N/A"
-                    : `${casino.wagering_requirement}×`}
-                  {casino.name === "Easybet" && " (selected slots*)"}
-                </td>
+                <td>{casino.welcome_bonus || NOT_STATED}</td>
+                <td>{formatWagering(casino.wagering_requirement)}</td>
                 <td>{formatMoney(casino.min_deposit, casino.currency)}</td>
                 <td>
-                  <a href={casino.source_url} target="_blank" rel="noreferrer">
+                  <a
+                    href={safeUrl(casino.source_url)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     View source ↗
                   </a>
                 </td>
@@ -117,9 +128,9 @@ export default function BonusTable({ casinos }) {
       </div>
 
       <p className="terms-note">
-        * Easybet's scraped source describes the 15× wagering requirement as
-        applying to selected slots. Check the linked source for the full terms
-        and any other conditions.
+        Wagering requirements and other conditions can differ by game or by part
+        of an offer. Check the linked source and the casino's own terms for the
+        full details.
       </p>
     </section>
   );

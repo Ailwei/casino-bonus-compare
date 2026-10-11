@@ -1,233 +1,86 @@
-# Casino Bonus Terms — Scraper + React
+# Casino bonus terms: scraper + React page
 
-A Python scraper reads three public South African casino review pages, uses a language model to convert bonus terms into structured data, and writes the results to `public/bonuses.json`. A React + Vite website displays the data in a responsive comparison interface.
+Compares the welcome-bonus terms (bonus, wagering requirement, minimum deposit) of three
+South Africa-facing casinos: 10bet, Mzansibet and Easybet.
 
-**Live website:** https://casino-bonus-compare.vercel.app/
+Python scraper -> `public/bonuses.json` -> React (Vite) page, hosted on Vercel.
+Live site (branded "BonusIndex"): https://casino-bonus-compare.vercel.app
 
-## 1. Requirements
+> Informational only. Figures are extracted automatically from a single third-party source and
+> may be wrong or out of date, so always check the terms on the operator's own site.
+> Gambling is for adults (18+). Please gamble responsibly.
 
-Install the following before running the project:
+## Install and run
 
-- Python 3.10 or newer
-- Node.js and npm
-- An API key for an OpenAI-compatible language model provider
-
-## 2. Install and run the scraper
-
-Open a terminal in the project root directory, where `scraper.py` and `requirements.txt` are located.
-
-Install the Python dependencies:
-
-```bash
-python -m pip install -r requirements.txt
 ```
+# 1) scraper
+pip install -r requirements.txt
+export LLM_API_KEY=...          # any OpenAI-compatible API (optional: LLM_BASE_URL, LLM_MODEL)
+python scraper.py               # writes public/bonuses.json
 
-On Windows, if `python` is not recognised, use:
-
-```powershell
-py -m pip install -r requirements.txt
-```
-
-### Configure environment variables
-
-Create a file named `.env` in the project root, next to `scraper.py`.
-
-Copy this example into `.env`:
-
-```env
-LLM_API_KEY=your_api_key_here
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_MODEL=gpt-4o-mini
-```
-
-Replace the example values with valid credentials and settings from your chosen language model provider.
-
-For example, if you use Groq, configure `LLM_BASE_URL` and `LLM_MODEL` with the endpoint and model name supported by your Groq account.
-
-**Security notes:**
-
-- `your_api_key_here` is a placeholder, not a working API key.
-- Each tester should use their own API key or receive approved test credentials securely.
-- Never commit `.env` or publish your API key on GitHub.
-- The repository's `.gitignore` excludes `.env` files.
-- Do not put private API keys in the React frontend or Vercel client-side environment variables.
-
-### Run the scraper
-
-```bash
-python scraper.py
-```
-
-On Windows, you can also run:
-
-```powershell
-py scraper.py
-```
-
-The scraper reads the source pages, validates extracted values, and writes the results to:
-
-```text
-public/bonuses.json
-```
-
-If the scraper fails to retrieve or validate the required sources, it should report an error rather than replace the existing data with an incomplete result.
-
-## 3. Run the website locally
-
-Install the JavaScript dependencies:
-
-```bash
+# 2) page
 npm install
+npm run dev                     # http://localhost:5173
+npm run build                   # static site in dist/
 ```
 
-Start the development server:
+Before running the scraper for real, set a real contact address in `USER_AGENT` in `scraper.py`.
+You can also put the variables above in a local `.env` file (real environment variables win).
 
-```bash
-npm run dev
-```
+Tests: `pytest -q` (extraction validation) and `npm test` (formatting helpers).
 
-Open the local URL printed in your terminal. It is usually:
+## Source
 
-http://localhost:5173/
+One public source: casino.org South Africa review pages for 10bet, Mzansibet and Easybet
+(URLs in `SOURCES` in `scraper.py`). robots.txt was checked on 2026-10-11 and allows these paths;
+the scraper also re-checks robots.txt on every run and skips any blocked page (or all pages, if
+robots.txt can't be fetched). It does not follow the site's affiliate links (`/casinos/`,
+disallowed by robots.txt).
 
-Create a production build:
+## How it runs
 
-```bash
-npm run build
-```
+The GitHub Actions workflow "Scrape and build" (`.github/workflows`) runs on every push to
+`main`, daily at 05:17 UTC, and on demand (Actions tab -> Run workflow).
 
-Vite writes the production files to the `dist/` directory.
+| Trigger | Steps |
+| --- | --- |
+| Push to `main` | `pytest` -> `npm test` -> `npm run build` |
+| Daily schedule / manual run | `pytest` -> scrape -> commit `public/bonuses.json` if changed -> `npm test` -> `npm run build` |
 
-## 4. Run the tests
+The scrape step needs the repository secret `LLM_API_KEY`. Optional repository variables
+`LLM_BASE_URL` and `LLM_MODEL` default to OpenAI and `gpt-4o-mini`. A failed run is reported by
+GitHub's standard failure notifications.
 
-Run the Python tests:
+## Deployment
 
-```bash
-python -m pytest -q
-```
+The site is hosted on Vercel, connected to this repository. Vercel rebuilds and deploys on each
+push to `main`, including the bot's `Update bonuses.json` commit, so fresh data goes live
+without a separate deploy step in the workflow. The workflow only checks that the site builds.
 
-On Windows, if necessary:
+## Design decisions
 
-```powershell
-py -m pytest -q
-```
+- `requests` + BeautifulSoup: terms are static HTML. Pages that need JS (under 200 characters of
+  extracted text) are skipped, not worked around.
+- The LLM only converts free text to fields (temperature 0, JSON output).
+- Unknown/ambiguous = `null`. The prompt tells the model to null conflicting figures and to use
+  the first-deposit welcome offer.
+- Each of `welcome_bonus`, `wagering_requirement` and `min_deposit` needs a verbatim evidence
+  snippet that appears in the page text, otherwise it is nulled. Types and ranges are validated
+  (wagering must be > 0 and <= 200, minimum deposit >= 0).
+- Currency is the exception: if the model returns none and the page contains a rand amount
+  (e.g. `R20`), it is set to `ZAR`. This is a fallback, not extracted evidence.
+- All-or-nothing: if any source fails or is skipped, the run exits non-zero and does NOT
+  overwrite the existing `bonuses.json`.
+- The React page renders everything from the JSON (offer count, update time and values; nothing typed in),
+  shows "Not stated" for every null field, only links `http(s)` source URLs, and shows no currency
+  rather than guessing one when the JSON has none.
+- Evidence snippets are stored in the JSON but not yet shown on the page.
 
-Run the JavaScript test command:
+## Known limits
 
-```bash
-npm test
-```
-
-Build the website to check for production compilation errors:
-
-```bash
-npm run build
-```
-
-The Python tests cover the extraction validation implemented in `tests/test_scraper.py`. Confirm the actual test output before reporting a test as passed. The JavaScript test command should not be described as testing formatting helpers unless those tests have been implemented.
-
-## 5. Data sources
-
-The scraper uses three public South African casino review pages configured in `SOURCES` inside `scraper.py`.
-
-The configured sources should be verified against the actual URLs in that file before submitting or changing this documentation.
-
-The scraper checks the source site's `robots.txt` rules and skips pages that it is not allowed to fetch. It does not attempt to bypass CAPTCHAs, access restrictions, or JavaScript challenges.
-
-Source pages and their terms can change. Extracted information should always be checked against the original source.
-
-## 6. Output data
-
-The generated `public/bonuses.json` file contains structured information about the reviewed casinos.
-
-Depending on the source and validation results, the data includes fields such as:
-
-- `welcome_bonus` — the advertised welcome offer.
-- `wagering_requirement` — the wagering multiplier, when it can be established.
-- `min_deposit` — the minimum deposit amount, when stated.
-- `currency` — the currency associated with monetary amounts.
-- `source_url` — the page from which the information was extracted.
-- `evidence` — supporting quotations from the source text.
-
-Unknown, ambiguous, or unsupported values should be represented as `null` rather than guessed. The website displays missing values as **Not stated**.
-
-## 7. Deployment
-
-The website is hosted on Vercel:
-
-https://casino-bonus-compare.vercel.app/
-
-Vercel can build and deploy the website automatically when changes are pushed to the connected GitHub repository's `main` branch.
-
-The production build command is:
-
-```bash
-npm run build
-```
-
-The output directory is:
-
-```text
-dist
-```
-
-### Automated scraping with GitHub Actions
-
-The GitHub Actions workflow is configured to run checks on pushes to `main`. Scheduled or manually triggered runs can also execute the scraper, depending on the workflow configuration.
-
-For automated scraping, configure the following in your GitHub repository under **Settings → Secrets and variables → Actions**:
-
-**Repository secret**
-
-```text
-LLM_API_KEY
-```
-
-**Repository variables**
-
-```text
-LLM_BASE_URL
-LLM_MODEL
-```
-
-Use the endpoint and model appropriate for your provider.
-
-If the workflow commits an updated `public/bonuses.json` file to `main`, that commit can trigger a new Vercel deployment through the repository integration.
-
-The scheduled run is intended to run daily at 05:17 UTC, which is 07:17 in South Africa (SAST). Verify the active workflow file to confirm the schedule is still configured.
-
-## 8. Design and validation decisions
-
-- **Python extraction:** `requests` and BeautifulSoup are used to retrieve and parse static HTML.
-- **Language model extraction:** the model converts free-text bonus terms into structured fields.
-- **Evidence-based validation:** extracted values are checked against source evidence.
-- **No guessing:** unknown or ambiguous values are represented as `null`.
-- **Robots.txt compliance:** disallowed pages are skipped rather than scraped.
-- **Failure handling:** failed or incomplete scraping runs should not replace the last valid dataset.
-- **React interface:** the website renders its comparison data from `public/bonuses.json` rather than relying on manually entered table rows.
-- **Responsive design:** the interface is designed to work on desktop and mobile screens.
-- **Source transparency:** users can inspect source links and supporting evidence where provided.
-
-## 9. Known limitations
-
-- JavaScript-rendered pages may not expose enough text for the scraper.
-- Bonus terms may differ between components of a multi-part offer. Fields that cannot be resolved consistently may be returned as `null`.
-- Source pages can contain conflicting figures or outdated promotional terms.
-- Wagering requirements must be interpreted in context; for example, `15x deposit` is not necessarily the same as `15x deposit plus bonus`.
-- The Python standard library's robots parser does not fully implement every wildcard convention used by some `robots.txt` files.
-- Scraped data is only as current and accurate as the accessible source pages and the validation process.
-- A successful extraction does not guarantee that a casino still offers the same promotion on its own website.
-
-## 10. Remaining verification before submission
-
-Before submitting the project, verify the following:
-
-- [ ] The source URLs in this README match `SOURCES` in `scraper.py`.
-- [ ] The `.env` configuration matches the provider used by the tester.
-- [ ] `.env` and real API credentials are not committed to Git.
-- [ ] `python -m pytest -q` passes.
-- [ ] `npm run build` completes successfully.
-- [ ] The live Vercel site loads and displays the generated data.
-- [ ] The GitHub Actions workflow matches the documented schedule and scraping behaviour.
-- [ ] Any unfinished integration or missing end-to-end test is disclosed honestly.
-
+- The evidence check confirms the snippet exists on the page, not that it supports the value.
+- Long pages are reduced to keyword-matching sentences and capped at 12,000 characters, so some
+  context can be dropped.
+- JS-rendered sources aren't supported. Multi-part offers get `null` for fields that differ per part.
+- Python's robots parser ignores `*` wildcards in paths (fine for these URLs; use a wildcard-aware
+  parser at scale).
