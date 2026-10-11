@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-10-11T13:21:57+00:00",
+  "scraped_at": "2026-10-11T14:57:20+00:00",
   "model": "openai/gpt-oss-120b",
   "casinos": [
     {
@@ -32,11 +32,11 @@
       "name": "Easybet",
       "source_url": "https://www.casino.org/en-za/reviews/easybet/",
       "evidence": {
-        "welcome_bonus": "150% match up to R1,500 on just R20 deposit",
+        "welcome_bonus": null,
         "wagering_requirement": "Wagering 15x deposit on selected slots",
         "min_deposit": "Minimum deposit R20"
       },
-      "welcome_bonus": "150% match up to R1,500",
+      "welcome_bonus": null,
       "wagering_requirement": 15,
       "min_deposit": 20,
       "currency": "ZAR"
