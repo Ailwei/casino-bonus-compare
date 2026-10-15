@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-10-14T10:18:08+00:00",
+  "scraped_at": "2026-10-15T10:01:02+00:00",
   "model": "openai/gpt-oss-120b",
   "casinos": [
     {
@@ -10,7 +10,7 @@
         "wagering_requirement": "Wagering Requirement 35x",
         "min_deposit": "Minimum Deposit R20"
       },
-      "welcome_bonus": "100% match up to R5,000",
+      "welcome_bonus": "100% match up to R5,000 on the first deposit",
       "wagering_requirement": 35,
       "min_deposit": 20,
       "currency": "ZAR"
