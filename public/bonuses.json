@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-10-18T09:41:24+00:00",
+  "scraped_at": "2026-10-19T10:51:40+00:00",
   "model": "openai/gpt-oss-120b",
   "casinos": [
     {
@@ -7,10 +7,10 @@
       "source_url": "https://www.casino.org/en-za/reviews/10bet/",
       "evidence": {
         "welcome_bonus": "Welcome bonus 100% match up to R5,000 on the first deposit.",
-        "wagering_requirement": "Wagering Requirement 35x",
+        "wagering_requirement": "low 35x wagering",
         "min_deposit": "Minimum Deposit R20"
       },
-      "welcome_bonus": "100% match up to R5,000",
+      "welcome_bonus": "100% up to R5,000",
       "wagering_requirement": 35,
       "min_deposit": 20,
       "currency": "ZAR"
@@ -19,7 +19,7 @@
       "name": "Mzansibet",
       "source_url": "https://www.casino.org/en-za/reviews/mzansibet/",
       "evidence": {
-        "welcome_bonus": "1st deposit 100% deposit match of up to R5,000 and 100 free spins",
+        "welcome_bonus": "1st deposit 100% deposit match of up to R5,000 and 100 free spins WELCOME1",
         "wagering_requirement": "Wagering requirements : 40x for each bonus.",
         "min_deposit": "Minimum deposit: R50 for each bonus."
       },
@@ -32,11 +32,11 @@
       "name": "Easybet",
       "source_url": "https://www.casino.org/en-za/reviews/easybet/",
       "evidence": {
-        "welcome_bonus": "150% match up to R1,500 on just R20 deposit",
+        "welcome_bonus": null,
         "wagering_requirement": "Wagering 15x deposit on selected slots",
         "min_deposit": "Minimum deposit R20"
       },
-      "welcome_bonus": "150% match up to R1,500",
+      "welcome_bonus": null,
       "wagering_requirement": 15,
       "min_deposit": 20,
       "currency": "ZAR"
