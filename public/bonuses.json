@@ -1,16 +1,16 @@
 {
-  "scraped_at": "2026-11-07T11:46:46+00:00",
+  "scraped_at": "2026-11-08T11:58:50+00:00",
   "model": "openai/gpt-oss-120b",
   "casinos": [
     {
       "name": "10bet",
       "source_url": "https://www.casino.org/en-za/reviews/10bet/",
       "evidence": {
-        "welcome_bonus": "Welcome bonus 100% match up to R5,000 on the first deposit.",
+        "welcome_bonus": "Welcome bonus 100% match up to R5,000 on the first deposit",
         "wagering_requirement": "Wagering Requirement 35x",
         "min_deposit": "Minimum Deposit R20"
       },
-      "welcome_bonus": "100% match up to R5,000",
+      "welcome_bonus": "100% up to R5,000",
       "wagering_requirement": 35,
       "min_deposit": 20,
       "currency": "ZAR"
@@ -36,7 +36,7 @@
         "wagering_requirement": "Wagering 15x deposit on selected slots",
         "min_deposit": "Minimum deposit R20"
       },
-      "welcome_bonus": "150% match up to R1,500",
+      "welcome_bonus": "150% match up to R1,500 on just R20 deposit",
       "wagering_requirement": 15,
       "min_deposit": 20,
       "currency": "ZAR"
