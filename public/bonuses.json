@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-11-10T13:32:50+00:00",
+  "scraped_at": "2026-11-11T12:46:42+00:00",
   "model": "openai/gpt-oss-120b",
   "casinos": [
     {
@@ -10,7 +10,7 @@
         "wagering_requirement": "Wagering Requirement 35x",
         "min_deposit": "Minimum Deposit R20"
       },
-      "welcome_bonus": "100% up to R5,000",
+      "welcome_bonus": "100% match up to R5,000",
       "wagering_requirement": 35,
       "min_deposit": 20,
       "currency": "ZAR"
@@ -19,7 +19,7 @@
       "name": "Mzansibet",
       "source_url": "https://www.casino.org/en-za/reviews/mzansibet/",
       "evidence": {
-        "welcome_bonus": "1st deposit 100% deposit match of up to R5,000 and 100 free spins",
+        "welcome_bonus": "1st deposit 100% deposit match of up to R5,000 and 100 free spins WELCOME1",
         "wagering_requirement": "Wagering requirements : 40x for each bonus.",
         "min_deposit": "Minimum deposit: R50 for each bonus."
       },
